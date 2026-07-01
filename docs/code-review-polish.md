@@ -31,3 +31,4 @@ Summary of hardening applied after full codebase review.
 ## Tests added/updated
 
 - `TENANT_ACCESS_DENIED`, pagination, invalid role, decision id mismatch, corrupt store, HTTP 404 mapping
+- Phase 10: evidence bundle, opaque cursor, platform bridge tests (79 total, ratcheted)

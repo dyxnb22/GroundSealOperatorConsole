@@ -1,5 +1,9 @@
 # TASKS.md
 
+## Project status — Complete
+
+Initial learning-subsystem scope (Phases 0–10) is done. See [`docs/case-study.md`](docs/case-study.md) and [`docs/known-limitations.md`](docs/known-limitations.md). Remaining items below are optional extensions, not blockers for closure.
+
 ## Phases 0–9 — Complete
 
 See [`docs/case-study.md`](docs/case-study.md) and git history.

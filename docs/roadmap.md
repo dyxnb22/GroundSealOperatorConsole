@@ -89,3 +89,16 @@
 - Evaluation criteria: the subsystem is credible as a standalone project and a reusable layer.
 - Exit criteria: external readers can understand both the build and the lessons.
 - Common risks: retrospective storytelling unsupported by artifacts.
+
+## Phase 10: Evidence And Platform Bridge
+
+- Goal: close the remaining planned operator surfaces — evidence browsing, run timeline visibility, and platform sync hooks.
+- Why it matters: reviewers need trace and evidence context without bypassing redaction; parent platforms need explicit mutation hooks.
+- Required artifacts: EvidenceBundle contract, HTTP endpoint, UI panels, PlatformBridgeStore, opaque pagination.
+- Evaluation criteria: evidence and timeline are tenant-scoped, redacted, and test-covered; platform hooks fire on mutations.
+- Exit criteria: initial learning-subsystem scope from PROJECT_BRIEF and README planned interfaces is satisfied.
+- Common risks: evidence payloads bypassing redaction; opaque cursors breaking backward compatibility.
+
+## Post Phase 10: Optional Extensions
+
+Auth middleware, live platform HTTP client, per-tenant policy overrides, and user studies remain documented in [`TASKS.md`](../TASKS.md) and [`known-limitations.md`](known-limitations.md). They are not required for initial project closure.

@@ -10,6 +10,8 @@ Phase 7 minimal React operator console.
 
 - Approval queue list (all statuses, tenant-scoped)
 - Detail panel with redacted preview fields
+- Run timeline panel (trace events for linked run)
+- Evidence bundle viewer (first linked bundle, role-aware redaction)
 - Approve / reject / request changes for `pending` items
 - Resubmit button for `changes_requested` items (admin role)
 

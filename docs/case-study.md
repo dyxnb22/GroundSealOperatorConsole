@@ -1,6 +1,6 @@
 # Case Study: GroundSealOperatorConsole
 
-Phase 9 summary for external readers. Claims are tied to artifacts in this repository.
+Build summary for external readers. Claims are tied to artifacts in this repository.
 
 ## Problem
 
@@ -8,7 +8,7 @@ Governed agent platforms need an operator surface for approval review, run timel
 
 ## Approach
 
-Subsystem-first, contract-led delivery across nine phases:
+Subsystem-first, contract-led delivery across ten phases:
 
 | Phase | Outcome |
 |-------|---------|
@@ -20,15 +20,20 @@ Subsystem-first, contract-led delivery across nine phases:
 | 6 | JSON file persistence + replay |
 | 7 | Minimal React operator UI |
 | 8 | Redaction policy experiment → role-based registry |
-| 9 | This case study + integration backfeed |
+| 9 | Case study + integration backfeed |
+| 10 | Evidence bundles, run timeline UI, platform bridge, opaque cursors |
 
 ## What was built
 
-- **Contracts**: Approval queue, detail, decision, timeline, redacted presentation
+- **Contracts**: Approval queue, detail, decision, timeline, redacted presentation, evidence bundle
 - **Core**: Deterministic state machine, tenant-scoped store, audit refs on decisions
-- **Safety**: Redaction before display; 11 ErrorCodes with regression tests
-- **Integration**: `pnpm serve` HTTP API; optional `GSOC_STORE_PATH` persistence
-- **UX**: `ui/` — queue, detail, redacted preview, decision actions
+- **Safety**: Redaction before display; 12 ErrorCodes with regression tests
+- **Integration**: `pnpm serve` HTTP API; optional `GSOC_STORE_PATH` persistence; `PlatformBridgeStore` hooks
+- **UX**: `ui/` — queue, detail, redacted preview, run timeline, evidence viewer, decision actions
+
+## Post-review polish
+
+After Phase 9, a full codebase review hardened tenant isolation, pagination, HTTP boundaries, FileStore validation, and validation-layer separation. See [`code-review-polish.md`](code-review-polish.md).
 
 ## Key lessons
 
@@ -40,10 +45,11 @@ Subsystem-first, contract-led delivery across nine phases:
 
 ## Evidence pointers
 
-- 56+ tests, eval ratchet in CI
-- Experiment: [`docs/experiments/`](experiments/redaction-policy-comparison.md)
+- 79 tests, eval ratchet in CI (`evals/baseline.json`)
+- Experiment: [`docs/experiments/redaction-policy-comparison.md`](experiments/redaction-policy-comparison.md)
 - Failure taxonomy: [`docs/failure-taxonomy.md`](failure-taxonomy.md)
 - Known limits: [`docs/known-limitations.md`](known-limitations.md)
+- Platform bridge: [`docs/platform-adapter.md`](platform-adapter.md)
 
 ## Residual risks
 
@@ -53,4 +59,4 @@ See [`integration-backfeed.md`](integration-backfeed.md#residual-risks).
 
 - Platform engineers integrating operator console into a larger agent system
 - Security reviewers evaluating redaction and tenancy boundaries
-- Future maintainers extending beyond Phase 9
+- Future maintainers extending optional follow-ups listed in [`TASKS.md`](../TASKS.md)

@@ -33,30 +33,33 @@ ground-seal-operator-console/
 
 ```bash
 pnpm install
-pnpm test          # run all tests
-pnpm test:watch    # watch mode
-pnpm typecheck     # tsc --noEmit
+pnpm test              # run all tests (50+)
+pnpm test:watch        # watch mode
+pnpm typecheck         # tsc --noEmit
+pnpm serve             # HTTP API on :3100
+pnpm eval:baseline     # regenerate evals/baseline.json
+pnpm eval:ratchet      # verify no regression vs baseline
 ```
 
-## Deterministic Local Mode
+## Operator UI
 
-Phase 2 uses `src/adapters/fixture-store.ts` as the integration adapter. It loads seeded approvals, runs, and evidence from an in-memory registry initialized from fixture data. Same inputs always produce same outputs.
+```bash
+pnpm serve             # terminal 1
+cd ui && pnpm install && pnpm dev   # terminal 2 → http://localhost:5173
+```
 
-## What Is Explicitly Out of Scope (Phase 2)
-
-- PostgreSQL or other persistence
-- OAuth / SSO
-- HTTP server or React UI
-- Live parent platform connection
+See [`docs/operator-ui.md`](operator-ui.md) and [`docs/local-dev.md`](local-dev.md).
 
 ## Phase Progression
 
 | Phase | Local dev adds |
 |-------|----------------|
-| 1 | Schemas, fixture parse tests |
-| 2 | Core service, fixture adapter, scenario tests |
-| 5+ | HTTP adapter, optional CI eval baseline |
-| 7 | React operator UI consuming `src/contracts` types |
+| 1–2 | Schemas, fixture adapter, scenario tests |
+| 3 | Negative-path suite, resubmit flow |
+| 4 | Eval baseline + CI ratchet |
+| 5 | HTTP server (`pnpm serve`) |
+| 6 | File persistence (`GSOC_STORE_PATH`) |
+| 7 | React UI in `ui/` |
 
 ## Environment Variables
 

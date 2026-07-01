@@ -19,4 +19,5 @@ dist/
 logs/
 reports/generated/
 notes/tmp/
+data/
 .cursor-cache/

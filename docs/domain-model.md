@@ -68,6 +68,10 @@ erDiagram
 | `redaction-pii.json` | RedactionSafety | PII masking fixture |
 | `malformed-timeline.json` | NegativePath | Out-of-order events |
 
+## Resubmit (Phase 3+)
+
+Platform-initiated `changes_requested → pending` via `resubmitApproval`. See [`docs/resubmit-handshake.md`](resubmit-handshake.md).
+
 ## Phase 2 Scope Boundary
 
-Resubmit (`changes_requested → pending`) is documented but not implemented in Phase 2 core; platform adapter will handle in Phase 5+.
+Phase 2 covered core approval path only. Phases 3–7 added resubmit, HTTP adapter, persistence, eval ratchet, and operator UI.

@@ -38,6 +38,16 @@ export function transitionApprovalStatus(
   return next;
 }
 
+export function transitionResubmitStatus(current: ApprovalStatus): ApprovalStatus {
+  if (current !== "changes_requested") {
+    throw new GsocError(
+      "INVALID_STATE_TRANSITION",
+      `Resubmit only valid from changes_requested, got '${current}'`,
+    );
+  }
+  return "pending";
+}
+
 export function decisionToStatus(decision: ApprovalDecisionType): ApprovalStatus {
   switch (decision) {
     case "approve":

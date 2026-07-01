@@ -1,28 +1,25 @@
 # Known Limitations
 
-Honest scope boundaries for Phase 2. Update as phases progress.
+Scope boundaries after Phase 7. Update as phases progress.
 
-## Runtime
+## Resolved in Phases 3–7
 
-- **No persistence**: Approval state lives in in-memory `FixtureStore`; restart resets data.
-- **No concurrency guarantees**: FixtureStore is not safe for concurrent writes.
-- **No HTTP server**: Core functions are library calls only; no REST/IPC adapter yet (Phase 5).
-- **No authentication**: TenantContext is caller-supplied and validated for shape, not cryptographically verified.
+- Negative-path regression suite with ErrorCode coverage (`tests/negative/`)
+- Eval baseline ratchet (`evals/baseline.json`, CI)
+- HTTP adapter for parent platform integration (`src/adapters/http-server.ts`)
+- JSON file persistence and replay (`FileStore`, `src/core/replay.ts`)
+- Minimal React operator UI (`ui/`)
 
-## Features
+## Remaining Runtime Limits
 
-- **No Web UI**: Operator views deferred to Phase 7.
-- **No evidence bundle loading**: ApprovalDetail returns bundle IDs only; full EvidenceItem fetch not implemented.
-- **No resubmit flow**: `changes_requested → pending` transition is platform-owned, not exposed in Phase 2 API.
-- **Single default redaction policy**: `DEFAULT_PII_POLICY` only; per-tenant policy selection not implemented.
-- **Pagination simplified**: Cursor is a numeric offset string; not production-grade opaque cursor.
+- **Auth not verified**: TenantContext is caller-supplied; no OAuth/SSO
+- **Single-node file store**: FileStore is not safe for concurrent multi-process writes
+- **Pagination simplified**: Cursor is offset-based, not opaque production token
+- **Default redaction policy only**: Per-tenant policy selection not implemented
+- **No evidence bundle loading**: Detail returns bundle IDs only
 
-## Testing
+## Phase 8+ (Not started)
 
-- All data is fixture-seeded; no live parent platform integration.
-- Redaction leak detection covers fixture-defined sensitive values; not exhaustive for all PII patterns.
-
-## Evaluation
-
-- No CI baseline ratchet yet (Phase 4).
-- Negative-path coverage is initial set from evaluation categories, not exhaustive adversarial suite (Phase 3).
+- Comparative policy experiments
+- Case study and integration backfeed
+- Production-grade cursor, auth integration, multi-tenant policy registry

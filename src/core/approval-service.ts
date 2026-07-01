@@ -2,28 +2,38 @@ import type {
   ApprovalDetail,
   ApprovalDecisionRequest,
   ApprovalDecisionResponse,
-  ApprovalQueueQuery,
   ApprovalQueueResponse,
 } from "../contracts/approval.js";
 import type { RunTimeline } from "../contracts/run.js";
-import { FixtureStore, parseApprovalQueueQuery } from "../adapters/fixture-store.js";
+import type { ResubmitApprovalRequest, ResubmitApprovalResponse } from "../contracts/resubmit.js";
+import type { ApprovalStore } from "../adapters/store-interface.js";
+import { MemoryStore } from "../adapters/memory-store.js";
+import {
+  parseApprovalQueueQuery,
+  parseApprovalDecisionRequest,
+  parseResubmitRequest,
+} from "../adapters/memory-store.js";
 
-let defaultStore: FixtureStore | undefined;
+let defaultStore: ApprovalStore | undefined;
 
-export function getDefaultStore(): FixtureStore {
+export function getDefaultStore(): ApprovalStore {
   if (!defaultStore) {
-    defaultStore = new FixtureStore();
+    defaultStore = new MemoryStore();
   }
   return defaultStore;
 }
 
+export function setDefaultStore(store: ApprovalStore): void {
+  defaultStore = store;
+}
+
 export function resetDefaultStore(): void {
-  defaultStore = new FixtureStore();
+  defaultStore = new MemoryStore();
 }
 
 export function getApprovalQueue(
   rawQuery: unknown,
-  store: FixtureStore = getDefaultStore(),
+  store: ApprovalStore = getDefaultStore(),
 ): ApprovalQueueResponse {
   const query = parseApprovalQueueQuery(rawQuery);
   return store.getApprovalQueue(query);
@@ -32,7 +42,7 @@ export function getApprovalQueue(
 export function getApprovalDetail(
   tenantId: string,
   approvalId: string,
-  store: FixtureStore = getDefaultStore(),
+  store: ApprovalStore = getDefaultStore(),
 ): ApprovalDetail {
   return store.getApprovalDetail(tenantId, approvalId);
 }
@@ -40,16 +50,27 @@ export function getApprovalDetail(
 export function getRunTimeline(
   tenantId: string,
   runId: string,
-  store: FixtureStore = getDefaultStore(),
+  store: ApprovalStore = getDefaultStore(),
 ): RunTimeline {
   return store.getRunTimeline(tenantId, runId);
 }
 
 export function submitApprovalDecision(
   request: ApprovalDecisionRequest,
-  store: FixtureStore = getDefaultStore(),
+  store: ApprovalStore = getDefaultStore(),
 ): ApprovalDecisionResponse {
   return store.submitApprovalDecision(request);
 }
 
-export { parseApprovalQueueQuery };
+export function resubmitApproval(
+  request: ResubmitApprovalRequest,
+  store: ApprovalStore = getDefaultStore(),
+): ResubmitApprovalResponse {
+  return store.resubmitApproval(request);
+}
+
+export {
+  parseApprovalQueueQuery,
+  parseApprovalDecisionRequest,
+  parseResubmitRequest,
+};

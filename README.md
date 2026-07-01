@@ -60,9 +60,9 @@ A governed agent platform needs an interface that helps humans review, approve, 
 
 ## Current Stage
 
-**Phase 2 is complete.** Deterministic approval queue core (contracts, state machine, redaction, fixture adapter) with 26 passing tests.
+**Phase 7 is complete.** HTTP adapter, file persistence, eval ratchet CI, and minimal React operator UI are in place. 50 tests passing.
 
-**Phase 3 is next:** expand negative-path regression coverage and error taxonomy.
+**Phase 8 is next:** comparative experiments on redaction or approval policy approaches.
 
 See [`TASKS.md`](TASKS.md) and [`docs/roadmap.md`](docs/roadmap.md) for sequencing.
 

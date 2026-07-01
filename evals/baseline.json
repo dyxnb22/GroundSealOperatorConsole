@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-01T13:13:06.448Z",
+  "testFiles": 7,
+  "testsPassed": 50,
+  "testsFailed": 0,
+  "contractPassRate": 1,
+  "negativePathCorrectness": 1,
+  "errorCodeCount": 11,
+  "evaluationCategories": [
+    "ContractValidation",
+    "TenantIsolation",
+    "NegativePath",
+    "ApprovalStateMachine",
+    "RedactionSafety"
+  ],
+  "notes": "Baseline ratchet: testsPassed must not decrease; testsFailed must stay 0."
+}

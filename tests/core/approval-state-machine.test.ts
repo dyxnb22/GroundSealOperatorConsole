@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { transitionApprovalStatus } from "../../src/core/approval-state-machine.js";
+import { transitionApprovalStatus, transitionResubmitStatus } from "../../src/core/approval-state-machine.js";
 import { GsocError } from "../../src/contracts/errors.js";
 
 describe("ApprovalStateMachine", () => {
@@ -28,6 +28,14 @@ describe("ApprovalStateMachine", () => {
 
   it("rejects transition from rejected (terminal)", () => {
     expect(() => transitionApprovalStatus("rejected", "reject")).toThrow(GsocError);
+  });
+
+  it("transitions changes_requested to pending on resubmit", () => {
+    expect(transitionResubmitStatus("changes_requested")).toBe("pending");
+  });
+
+  it("rejects resubmit from pending", () => {
+    expect(() => transitionResubmitStatus("pending")).toThrow(GsocError);
   });
 
   it("rejects decision on changes_requested in Phase 2", () => {

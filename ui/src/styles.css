@@ -1,0 +1,172 @@
+:root {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background: #f5f5f5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.error {
+  background: #fde8e8;
+  border: 1px solid #f5c2c2;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+.loading {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.panel h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+}
+
+.panel li button {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fafafa;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.panel li button.selected {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.panel li button strong {
+  display: block;
+}
+
+.status {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: #e5e7eb;
+  margin: 0.25rem 0;
+}
+
+.status-pending {
+  background: #fef3c7;
+}
+
+.status-approved {
+  background: #d1fae5;
+}
+
+.status-rejected {
+  background: #fee2e2;
+}
+
+.status-changes_requested {
+  background: #e0e7ff;
+}
+
+.meta {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1rem;
+}
+
+dt {
+  font-weight: 600;
+  color: #444;
+}
+
+.redacted {
+  list-style: none;
+  padding: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+.actions textarea {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #f3f4f6;
+}
+
+.placeholder {
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .panels {
+    grid-template-columns: 1fr;
+  }
+}

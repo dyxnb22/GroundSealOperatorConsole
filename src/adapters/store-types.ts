@@ -1,5 +1,22 @@
 import type { ApprovalStatus } from "../contracts/approval.js";
 import type { RunTimeline } from "../contracts/run.js";
+import type { EvidenceItemKind } from "../contracts/evidence.js";
+
+export interface InternalEvidenceItem {
+  itemId: string;
+  kind: EvidenceItemKind;
+  label: string;
+  summary: string;
+  contentRef?: string | null;
+  rawPayload: Record<string, unknown>;
+}
+
+export interface InternalEvidenceBundle {
+  bundleId: string;
+  tenantId: string;
+  label: string;
+  items: InternalEvidenceItem[];
+}
 
 export interface InternalApproval {
   approvalId: string;
@@ -38,4 +55,5 @@ export interface StoreSnapshot {
   approvals: InternalApproval[];
   runs: InternalRun[];
   auditLog: AuditEntry[];
+  evidenceBundles?: InternalEvidenceBundle[];
 }

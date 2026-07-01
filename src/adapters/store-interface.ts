@@ -7,6 +7,7 @@ import type {
 } from "../contracts/approval.js";
 import type { RunTimeline } from "../contracts/run.js";
 import type { ResubmitApprovalRequest, ResubmitApprovalResponse } from "../contracts/resubmit.js";
+import type { EvidenceBundle } from "../contracts/evidence.js";
 import type { StoreSnapshot } from "./store-types.js";
 
 import type { OperatorRole } from "../contracts/tenant.js";
@@ -23,6 +24,11 @@ export interface ApprovalStore {
     options?: DetailOptions,
   ): ApprovalDetail;
   getRunTimeline(tenantId: string, runId: string): RunTimeline;
+  getEvidenceBundle(
+    tenantId: string,
+    bundleId: string,
+    options?: DetailOptions,
+  ): EvidenceBundle;
   submitApprovalDecision(request: ApprovalDecisionRequest): ApprovalDecisionResponse;
   resubmitApproval(request: ResubmitApprovalRequest): ResubmitApprovalResponse;
   snapshot(): StoreSnapshot;

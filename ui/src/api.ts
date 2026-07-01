@@ -30,7 +30,7 @@ export interface RedactedField {
 export interface ApprovalDetail {
   approvalId: string;
   tenantId: string;
-  status: string;
+  status: ApprovalStatus;
   subject: string;
   runId: string;
   evidenceBundleIds: string[];

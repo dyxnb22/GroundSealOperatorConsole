@@ -65,6 +65,10 @@ export class FileStore implements ApprovalStore {
     return this.inner.getRunTimeline(...args);
   }
 
+  getEvidenceBundle(...args: Parameters<ApprovalStore["getEvidenceBundle"]>) {
+    return this.inner.getEvidenceBundle(...args);
+  }
+
   submitApprovalDecision(...args: Parameters<ApprovalStore["submitApprovalDecision"]>) {
     const result = this.inner.submitApprovalDecision(...args);
     this.persist();

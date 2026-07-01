@@ -39,6 +39,11 @@ export function diffSnapshots(a: StoreSnapshot, b: StoreSnapshot): string[] {
   if (a.auditLog.length !== b.auditLog.length) {
     diffs.push(`auditLog: ${a.auditLog.length} vs ${b.auditLog.length}`);
   }
+  const aEvidence = a.evidenceBundles?.length ?? 0;
+  const bEvidence = b.evidenceBundles?.length ?? 0;
+  if (aEvidence !== bEvidence) {
+    diffs.push(`evidenceBundles: ${aEvidence} vs ${bEvidence}`);
+  }
 
   for (const approval of a.approvals) {
     const other = b.approvals.find((x) => x.approvalId === approval.approvalId);

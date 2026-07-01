@@ -99,6 +99,13 @@ describe("HTTP integration boundary", () => {
     expect(json.status).toBe("pending");
   });
 
+  it("GET evidence bundle returns items", async () => {
+    const { status, json } = await get("/api/evidence/evb-001?tenantId=tenant-a&role=reviewer");
+    expect(status).toBe(200);
+    expect(json.bundleId).toBe("evb-001");
+    expect(json.items.length).toBeGreaterThan(0);
+  });
+
   it("returns 404 for unknown route", async () => {
     const { status } = await get("/api/unknown");
     expect(status).toBe(404);

@@ -22,6 +22,9 @@ Default: `http://127.0.0.1:3100`
 | POST | `/api/approvals/:id/decision` | ApprovalDecisionRequest | ApprovalDecisionResponse |
 | POST | `/api/approvals/:id/resubmit` | ResubmitApprovalRequest | ResubmitApprovalResponse |
 | GET | `/api/runs/:runId/timeline?tenantId=` | — | RunTimeline |
+| GET | `/api/evidence/:bundleId?tenantId=&role=` | — | EvidenceBundle |
+
+Pagination cursors in queue responses are opaque base64url tokens (legacy numeric strings still accepted).
 
 ## Error shape
 

@@ -202,7 +202,8 @@ describe("Queue pagination", () => {
       limit: 2,
     });
     expect(page1.items).toHaveLength(2);
-    expect(page1.nextCursor).toBe("2");
+    expect(page1.nextCursor).toBeTruthy();
+    expect(page1.nextCursor).not.toBe("2");
 
     const page2 = getApprovalQueue({
       tenantContext: { tenantId: "tenant-a", role: "reviewer" },

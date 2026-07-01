@@ -16,7 +16,7 @@ After Phases 0–9. Optional future extensions listed at bottom.
 - **FileStore not multi-process safe**: Use platform DB adapter in production
 - **Offset pagination only**: Not production opaque cursor
 - **Per-tenant policy overrides**: Role-based only; no tenant-specific registry
-- **Evidence bundles**: IDs only; no full bundle viewer
+- **Evidence bundles**: Full bundle load via `GET /api/evidence/:id` with redaction (Phase 10)
 - **Redaction utility score**: Heuristic; not validated by user studies
 - **Hash fields**: Correlation aid only; not cryptographic
 

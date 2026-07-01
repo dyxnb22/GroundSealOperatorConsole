@@ -14,18 +14,40 @@ export function assertTenantMatch(
   }
 }
 
+interface CursorPayload {
+  o: number;
+}
+
+function decodeOpaqueCursor(cursor: string): number {
+  try {
+    const json = Buffer.from(cursor, "base64url").toString("utf-8");
+    const parsed = JSON.parse(json) as CursorPayload;
+    if (typeof parsed.o !== "number" || !Number.isFinite(parsed.o) || parsed.o < 0) {
+      throw new Error("invalid");
+    }
+    return parsed.o;
+  } catch {
+    throw new GsocError("INVALID_QUERY", "Invalid pagination cursor");
+  }
+}
+
+export function encodeCursorOffset(offset: number): string {
+  const payload: CursorPayload = { o: offset };
+  return Buffer.from(JSON.stringify(payload)).toString("base64url");
+}
+
+/** Accept opaque base64url cursor; legacy numeric string cursors still supported. */
 export function parseCursorOffset(cursor: string | undefined): number {
   if (cursor === undefined) {
     return 0;
   }
-  const offset = Number.parseInt(cursor, 10);
-  if (!Number.isFinite(offset) || offset < 0) {
-    throw new GsocError("INVALID_QUERY", "Invalid pagination cursor");
+  if (/^\d+$/.test(cursor)) {
+    return Number.parseInt(cursor, 10);
   }
-  return offset;
+  return decodeOpaqueCursor(cursor);
 }
 
 export function nextCursor(offset: number, limit: number, total: number): string | null {
   const next = offset + limit;
-  return next < total ? String(next) : null;
+  return next < total ? encodeCursorOffset(next) : null;
 }

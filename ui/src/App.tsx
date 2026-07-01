@@ -6,6 +6,12 @@ import {
   submitDecision,
   resubmitApproval,
 } from "./api";
+import {
+  fetchRunTimeline,
+  fetchEvidenceBundle,
+  type RunTimeline,
+  type EvidenceBundle,
+} from "./api-evidence";
 
 const DEFAULT_TENANT: TenantContext = {
   tenantId: "tenant-a",
@@ -18,6 +24,8 @@ export function App() {
   const [items, setItems] = useState<ApprovalQueueItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ApprovalDetail | null>(null);
+  const [timeline, setTimeline] = useState<RunTimeline | null>(null);
+  const [evidence, setEvidence] = useState<EvidenceBundle | null>(null);
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,6 +51,20 @@ export function App() {
         const d = await fetchDetail(tenant.tenantId, approvalId, tenant.role);
         setDetail(d);
         setSelectedId(approvalId);
+
+        const tl = await fetchRunTimeline(tenant.tenantId, d.runId);
+        setTimeline(tl);
+
+        if (d.evidenceBundleIds[0]) {
+          const ev = await fetchEvidenceBundle(
+            tenant.tenantId,
+            d.evidenceBundleIds[0],
+            tenant.role,
+          );
+          setEvidence(ev);
+        } else {
+          setEvidence(null);
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to load detail");
       } finally {
@@ -140,6 +162,48 @@ export function App() {
                 <dt>Evidence bundles</dt>
                 <dd>{detail.evidenceBundleIds.join(", ") || "none"}</dd>
               </dl>
+
+              <h3>Run timeline</h3>
+              {!timeline || timeline.events.length === 0 ? (
+                <p className="placeholder">No trace events.</p>
+              ) : (
+                <ol className="timeline">
+                  {timeline.events.map((e) => (
+                    <li key={e.eventId}>
+                      <time>{e.timestamp}</time>
+                      <strong>{e.kind}</strong>
+                      <span>{e.summary}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+
+              <h3>Evidence</h3>
+              {!evidence ? (
+                <p className="placeholder">No evidence bundle linked.</p>
+              ) : (
+                <div className="evidence">
+                  <p>
+                    <strong>{evidence.label}</strong> ({evidence.bundleId})
+                  </p>
+                  <ul>
+                    {evidence.items.map((item) => (
+                      <li key={item.itemId}>
+                        <strong>{item.label}</strong> — {item.summary}
+                        {item.redactedFields.length > 0 && (
+                          <ul className="redacted">
+                            {item.redactedFields.map((f) => (
+                              <li key={f.path}>
+                                {f.label}: {f.value}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <h3>Redacted preview</h3>
               <ul className="redacted">

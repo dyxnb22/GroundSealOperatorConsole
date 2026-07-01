@@ -8,6 +8,7 @@ import type {
 } from "../contracts/approval.js";
 import type { RunTimeline } from "../contracts/run.js";
 import { assertTimelineOrdered } from "../contracts/run.js";
+import type { EvidenceBundle } from "../contracts/evidence.js";
 import type { ResubmitApprovalRequest, ResubmitApprovalResponse } from "../contracts/resubmit.js";
 import { GsocError } from "../contracts/errors.js";
 import { resolvePolicyForRole } from "../policy/policy-registry.js";
@@ -21,16 +22,60 @@ import type { ApprovalStore, DetailOptions } from "./store-interface.js";
 import type {
   AuditEntry,
   InternalApproval,
+  InternalEvidenceBundle,
   InternalRun,
   StoreSnapshot,
 } from "./store-types.js";
 import { parseStoreSnapshot } from "./store-schema.js";
 import { assertTenantMatch, parseCursorOffset, nextCursor } from "./tenant-access.js";
 
+export function seedEvidenceBundles(): InternalEvidenceBundle[] {
+  return [
+    {
+      bundleId: "evb-001",
+      tenantId: "tenant-a",
+      label: "Config change evidence",
+      items: [
+        {
+          itemId: "evi-001",
+          kind: "policy_check",
+          label: "Policy evaluation",
+          summary: "Policy check passed for config patch",
+          contentRef: "payload-ref-policy-001",
+          rawPayload: { applicant: { email: "alex@example.com" } },
+        },
+        {
+          itemId: "evi-002",
+          kind: "tool_output",
+          label: "Config diff",
+          summary: "Diff between v2.2 and v2.3",
+          contentRef: "payload-ref-diff-001",
+          rawPayload: { credentials: { token: "token-abc", apiKey: "key-xyz" } },
+        },
+      ],
+    },
+    {
+      bundleId: "evb-003",
+      tenantId: "tenant-b",
+      label: "Tenant B job evidence",
+      items: [
+        {
+          itemId: "evi-003",
+          kind: "log_excerpt",
+          label: "Job planner log",
+          summary: "Planner selected workflow step 3",
+          rawPayload: { applicant: { email: "bob@tenant-b.com" } },
+        },
+      ],
+    },
+  ];
+}
+
 export function seedData(): {
   approvals: InternalApproval[];
   runs: InternalRun[];
   auditLog: AuditEntry[];
+  evidenceBundles: InternalEvidenceBundle[];
 } {
   return {
     approvals: [
@@ -176,12 +221,14 @@ export function seedData(): {
       },
     ],
     auditLog: [],
+    evidenceBundles: seedEvidenceBundles(),
   };
 }
 
 export class MemoryStore implements ApprovalStore {
   private approvals!: Map<string, InternalApproval>;
   private runs!: Map<string, InternalRun>;
+  private evidenceBundles!: Map<string, InternalEvidenceBundle>;
   private auditLog!: AuditEntry[];
 
   constructor(snapshot?: StoreSnapshot) {
@@ -191,6 +238,9 @@ export class MemoryStore implements ApprovalStore {
       const seed = seedData();
       this.approvals = new Map(seed.approvals.map((a) => [a.approvalId, { ...a }]));
       this.runs = new Map(seed.runs.map((r) => [r.runId, r]));
+      this.evidenceBundles = new Map(
+        seed.evidenceBundles.map((b) => [b.bundleId, structuredClone(b)]),
+      );
       this.auditLog = [...seed.auditLog];
     }
   }
@@ -258,6 +308,37 @@ export class MemoryStore implements ApprovalStore {
 
     assertTimelineOrdered(run!.timeline.events);
     return run!.timeline;
+  }
+
+  getEvidenceBundle(
+    tenantId: string,
+    bundleId: string,
+    options?: DetailOptions,
+  ): EvidenceBundle {
+    const bundle = this.evidenceBundles.get(bundleId);
+    assertTenantMatch(bundle?.tenantId, tenantId, `Evidence bundle ${bundleId}`);
+
+    const role = options?.role ?? "reviewer";
+    const policy = resolvePolicyForRole(role);
+
+    const items = bundle!.items.map((item) => {
+      const redacted = buildRedactedView({ payload: item.rawPayload, policy });
+      return {
+        itemId: item.itemId,
+        kind: item.kind,
+        label: item.label,
+        summary: item.summary,
+        contentRef: item.contentRef ?? null,
+        redactedFields: redacted.fields,
+      };
+    });
+
+    return {
+      bundleId: bundle!.bundleId,
+      tenantId: bundle!.tenantId,
+      label: bundle!.label,
+      items,
+    };
   }
 
   submitApprovalDecision(
@@ -329,6 +410,7 @@ export class MemoryStore implements ApprovalStore {
       approvals: [...this.approvals.values()].map(cloneApproval),
       runs: [...this.runs.values()],
       auditLog: [...this.auditLog],
+      evidenceBundles: [...this.evidenceBundles.values()].map((b) => structuredClone(b)),
     };
   }
 
@@ -341,6 +423,8 @@ export class MemoryStore implements ApprovalStore {
     this.approvals = new Map(data.approvals.map((a) => [a.approvalId, cloneApproval(a)]));
     this.runs = new Map(data.runs.map((r) => [r.runId, r]));
     this.auditLog = [...data.auditLog];
+    const bundles = data.evidenceBundles ?? seedEvidenceBundles();
+    this.evidenceBundles = new Map(bundles.map((b) => [b.bundleId, structuredClone(b)]));
   }
 }
 

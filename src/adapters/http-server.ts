@@ -113,6 +113,27 @@ async function handleRequest(
     return sendJson(res, 200, store.getRunTimeline(tenantId, decodeURIComponent(runMatch[1]!)));
   }
 
+  const evidenceMatch = path.match(/^\/api\/evidence\/([^/]+)$/);
+  if (method === "GET" && evidenceMatch) {
+    const tenantId = url.searchParams.get("tenantId");
+    if (!tenantId) {
+      return sendJson(res, 400, {
+        code: "INVALID_QUERY",
+        message: "tenantId query param required",
+      });
+    }
+    try {
+      const role = parseOperatorRole(url.searchParams.get("role"));
+      return sendJson(
+        res,
+        200,
+        store.getEvidenceBundle(tenantId, decodeURIComponent(evidenceMatch[1]!), { role }),
+      );
+    } catch (error) {
+      return sendError(res, 400, error);
+    }
+  }
+
   sendJson(res, 404, { code: "NOT_FOUND", message: "Route not found" });
 }
 

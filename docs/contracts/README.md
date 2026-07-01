@@ -1,6 +1,6 @@
 # Public Contract Index
 
-Phase 1 must implement these five public contract surfaces. Each linked document defines fields, invariants, untrusted input handling, and failure response shapes.
+Phase 1–10 public contract surfaces. Each linked document defines fields, invariants, untrusted input handling, and failure response shapes.
 
 | # | Contract | Purpose | Document |
 |---|----------|---------|----------|
@@ -9,6 +9,7 @@ Phase 1 must implement these five public contract surfaces. Each linked document
 | 3 | ApprovalDecision | Submit approve / reject / request_changes | [approval-decision.md](./approval-decision.md) |
 | 4 | RunTimeline | Ordered trace events for a run | [run-timeline.md](./run-timeline.md) |
 | 5 | RedactedPresentation | Policy-driven safe display model | [redacted-presentation.md](./redacted-presentation.md) |
+| 6 | EvidenceBundle | Redacted evidence items for review | [evidence-bundle.md](./evidence-bundle.md) |
 
 ## Shared Types
 

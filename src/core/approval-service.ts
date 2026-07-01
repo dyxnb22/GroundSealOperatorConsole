@@ -5,6 +5,7 @@ import type {
   ApprovalQueueResponse,
 } from "../contracts/approval.js";
 import type { RunTimeline } from "../contracts/run.js";
+import type { EvidenceBundle } from "../contracts/evidence.js";
 import type { ResubmitApprovalRequest, ResubmitApprovalResponse } from "../contracts/resubmit.js";
 import type { ApprovalStore, DetailOptions } from "../adapters/store-interface.js";
 import { MemoryStore } from "../adapters/memory-store.js";
@@ -62,6 +63,15 @@ export function getRunTimeline(
   ctx?: ServiceContext,
 ): RunTimeline {
   return resolveStore(ctx).getRunTimeline(tenantId, runId);
+}
+
+export function getEvidenceBundle(
+  tenantId: string,
+  bundleId: string,
+  options?: DetailOptions,
+  ctx?: ServiceContext,
+): EvidenceBundle {
+  return resolveStore(ctx).getEvidenceBundle(tenantId, bundleId, options);
 }
 
 export function submitApprovalDecision(

@@ -1,6 +1,23 @@
 import { z } from "zod";
 import { ApprovalStatusSchema } from "../contracts/approval.js";
 import { RunTimelineSchema } from "../contracts/run.js";
+import { EvidenceItemKindSchema } from "../contracts/evidence.js";
+
+export const InternalEvidenceItemSchema = z.object({
+  itemId: z.string().min(1),
+  kind: EvidenceItemKindSchema,
+  label: z.string(),
+  summary: z.string(),
+  contentRef: z.string().nullable().optional(),
+  rawPayload: z.record(z.unknown()),
+});
+
+export const InternalEvidenceBundleSchema = z.object({
+  bundleId: z.string().min(1),
+  tenantId: z.string().min(1),
+  label: z.string(),
+  items: z.array(InternalEvidenceItemSchema),
+});
 
 export const InternalApprovalSchema = z.object({
   approvalId: z.string().min(1),
@@ -39,6 +56,7 @@ export const StoreSnapshotSchema = z.object({
   approvals: z.array(InternalApprovalSchema),
   runs: z.array(InternalRunSchema),
   auditLog: z.array(AuditEntrySchema),
+  evidenceBundles: z.array(InternalEvidenceBundleSchema).optional(),
 });
 
 export function parseStoreSnapshot(raw: unknown) {

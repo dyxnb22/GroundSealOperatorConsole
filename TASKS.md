@@ -1,35 +1,29 @@
 # TASKS.md
 
-## Phases 0–7 — Complete
+## Phases 0–9 — Complete
 
-See [`docs/roadmap.md`](docs/roadmap.md) and git history.
+See [`docs/case-study.md`](docs/case-study.md) and git history.
 
-## Phase 8 — Complete
+## Phase 10 — Complete
 
-- [x] Compare redaction policies (`default-pii` vs `strict-omit`) with deterministic corpus
-- [x] Experiment docs ([`docs/experiments/redaction-policy-comparison.md`](docs/experiments/redaction-policy-comparison.md))
-- [x] Decision memo ([`docs/experiments/decision-memo-redaction.md`](docs/experiments/decision-memo-redaction.md))
-- [x] Role-based policy registry (`src/policy/policy-registry.ts`)
-- [x] Eval harness (`pnpm eval:experiment`, `tests/evals/redaction-comparison.test.ts`)
+- [x] EvidenceBundle contract and `getEvidenceBundle` ([`docs/contracts/evidence-bundle.md`](docs/contracts/evidence-bundle.md))
+- [x] HTTP `GET /api/evidence/:bundleId`
+- [x] UI evidence viewer + run timeline panel
+- [x] PlatformBridgeStore + PlatformSyncHooks ([`docs/platform-adapter.md`](docs/platform-adapter.md))
+- [x] Opaque pagination cursors (legacy numeric supported)
 
-## Phase 9 — Complete
+## Post-review polish — Complete
 
-- [x] Case study ([`docs/case-study.md`](docs/case-study.md))
-- [x] Integration backfeed ([`docs/integration-backfeed.md`](docs/integration-backfeed.md))
-- [x] Updated integration contract with resolved questions
-
-## Project complete (Phases 0–9)
-
-All roadmap phases documented and tested. Post-review polish tracked in [`docs/code-review-polish.md`](docs/code-review-polish.md).
+See [`docs/code-review-polish.md`](docs/code-review-polish.md).
 
 ## Optional follow-ups
 
-- Production `ApprovalStore` adapter for parent platform DB
-- User study validating redaction utility heuristic
-- Full evidence bundle browser
+- Live platform HTTP client implementation (replace RecordingPlatformHooks)
+- Auth middleware in front of HTTP server
+- Per-tenant redaction policy overrides
+- User study on redaction utility heuristic
 
 ## Sequencing Rules
 
 - Prefer docs -> contracts -> tests -> implementation.
 - Run `pnpm eval:ratchet` before merging; update baseline when adding tests intentionally.
-- Run `pnpm eval:experiment` when changing redaction policies.

@@ -1,0 +1,12 @@
+---
+description: Project boundary rules for GroundSealOperatorConsole
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+- This repository exists to build GroundSealOperatorConsole, not a general-purpose agent platform.
+- Keep work aligned to the subsystem focus: approval review UX, run timelines, trace visibility, evidence browsing, redaction-aware presentation, and tenant-safe operator flows.
+- Before implementation, map each task to a roadmap phase.
+- Do not add neighboring subsystems unless the integration contract explicitly requires it.
+- Favor clarity, contracts, and evaluability over scope growth.

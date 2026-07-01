@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "serve": "tsx src/cli/serve.ts",
     "eval:baseline": "tsx scripts/eval-baseline.ts",
-    "eval:ratchet": "tsx scripts/eval-ratchet.ts"
+    "eval:ratchet": "tsx scripts/eval-ratchet.ts",
+    "eval:experiment": "tsx scripts/run-redaction-experiment.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

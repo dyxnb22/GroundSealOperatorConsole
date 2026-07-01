@@ -43,8 +43,12 @@ export class FileStore implements ApprovalStore {
     return this.inner.getApprovalQueue(...args);
   }
 
-  getApprovalDetail(...args: Parameters<ApprovalStore["getApprovalDetail"]>) {
-    return this.inner.getApprovalDetail(...args);
+  getApprovalDetail(
+    tenantId: string,
+    approvalId: string,
+    options?: { role?: import("../contracts/tenant.js").OperatorRole },
+  ) {
+    return this.inner.getApprovalDetail(tenantId, approvalId, options);
   }
 
   getRunTimeline(...args: Parameters<ApprovalStore["getRunTimeline"]>) {

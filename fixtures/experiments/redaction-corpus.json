@@ -1,0 +1,46 @@
+{
+  "entries": [
+    {
+      "id": "standard-pii",
+      "payload": {
+        "applicant": {
+          "name": "Alex Operator",
+          "email": "alex@example.com",
+          "phone": "555-0100",
+          "ssn": "123-45-6789"
+        },
+        "credentials": {
+          "token": "secret-token-abc",
+          "apiKey": "key-xyz-789"
+        }
+      },
+      "sensitiveValues": [
+        "123-45-6789",
+        "secret-token-abc",
+        "alex@example.com",
+        "555-0100",
+        "key-xyz-789"
+      ]
+    },
+    {
+      "id": "minimal-applicant",
+      "payload": {
+        "applicant": {
+          "email": "reviewer@corp.io",
+          "phone": "555-9999"
+        }
+      },
+      "sensitiveValues": ["reviewer@corp.io", "555-9999"]
+    },
+    {
+      "id": "credentials-only",
+      "payload": {
+        "credentials": {
+          "token": "bearer-xyz",
+          "apiKey": "ak_live_123"
+        }
+      },
+      "sensitiveValues": ["bearer-xyz", "ak_live_123"]
+    }
+  ]
+}

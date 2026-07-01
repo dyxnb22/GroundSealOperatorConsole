@@ -48,9 +48,10 @@ export async function fetchQueue(tenant: TenantContext): Promise<ApprovalQueueIt
 export async function fetchDetail(
   tenantId: string,
   approvalId: string,
+  role: TenantContext["role"] = "reviewer",
 ): Promise<ApprovalDetail> {
   const res = await fetch(
-    `${API_BASE}/api/approvals/${encodeURIComponent(approvalId)}?tenantId=${encodeURIComponent(tenantId)}`,
+    `${API_BASE}/api/approvals/${encodeURIComponent(approvalId)}?tenantId=${encodeURIComponent(tenantId)}&role=${encodeURIComponent(role)}`,
   );
   if (!res.ok) throw new Error(await res.text());
   return res.json() as Promise<ApprovalDetail>;

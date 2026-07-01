@@ -48,17 +48,21 @@ These five public types are stable integration surfaces; see [`docs/contracts/RE
 
 Platform-specific identifiers (internal DB keys, auth tokens) MUST NOT leak into these contracts. Adapters translate at the boundary.
 
-## Resolved Questions (Phase 0)
+## Resolved Questions (Phase 0–9)
 
 | Question | Decision |
 |----------|----------|
 | Which types stay platform-neutral? | The five public contracts above |
 | Where is tenancy enforced? | Validated on every request in core layer; adapter scopes lookups by tenantId |
 | Shared vs local models? | Public contracts shared; fixture registry and internal indexes are subsystem-local |
-| Default evidence flow? | ApprovalDetail returns evidence bundle IDs; full bundle load is a separate adapter call in later phases |
+| Default evidence flow? | ApprovalDetail returns evidence bundle IDs; full bundle load is platform adapter concern |
+| HTTP vs IPC adapter shape? | HTTP implemented — see [`docs/http-api.md`](http-api.md) |
+| Pagination cursor encoding? | Offset string in Phase 2–7; production adapter may use opaque cursor |
+| Resubmit ownership? | Platform-initiated — see [`docs/resubmit-handshake.md`](resubmit-handshake.md) |
+| Redaction policy selection? | Role-based — see [`docs/experiments/decision-memo-redaction.md`](experiments/decision-memo-redaction.md) |
 
-## Questions To Resolve Later
+## Backfeed
 
-- HTTP vs IPC adapter shape (Phase 5)
-- Pagination cursor encoding for production adapters
-- Whether resubmit (`changes_requested → pending`) is platform-initiated or console-initiated
+Platform integration recommendations: [`docs/integration-backfeed.md`](integration-backfeed.md)
+
+Case study: [`docs/case-study.md`](case-study.md)

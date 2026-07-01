@@ -1,25 +1,29 @@
 # Known Limitations
 
-Scope boundaries after Phase 7. Update as phases progress.
+After Phases 0–9. Optional future extensions listed at bottom.
 
-## Resolved in Phases 3–7
+## Resolved
 
-- Negative-path regression suite with ErrorCode coverage (`tests/negative/`)
-- Eval baseline ratchet (`evals/baseline.json`, CI)
-- HTTP adapter for parent platform integration (`src/adapters/http-server.ts`)
-- JSON file persistence and replay (`FileStore`, `src/core/replay.ts`)
-- Minimal React operator UI (`ui/`)
+- Negative-path ErrorCode coverage
+- Eval baseline + CI ratchet
+- HTTP adapter, file persistence, replay
+- Operator UI with role-aware redaction
+- Comparative redaction experiment + role-based policy registry
 
-## Remaining Runtime Limits
+## Remaining limits
 
-- **Auth not verified**: TenantContext is caller-supplied; no OAuth/SSO
-- **Single-node file store**: FileStore is not safe for concurrent multi-process writes
-- **Pagination simplified**: Cursor is offset-based, not opaque production token
-- **Default redaction policy only**: Per-tenant policy selection not implemented
-- **No evidence bundle loading**: Detail returns bundle IDs only
+- **Auth not verified**: TenantContext is caller-supplied
+- **FileStore not multi-process safe**: Use platform DB adapter in production
+- **Offset pagination only**: Not production opaque cursor
+- **Per-tenant policy overrides**: Role-based only; no tenant-specific registry
+- **Evidence bundles**: IDs only; no full bundle viewer
+- **Redaction utility score**: Heuristic; not validated by user studies
+- **Hash fields**: Correlation aid only; not cryptographic
 
-## Phase 8+ (Not started)
+## Optional future work (post Phase 9)
 
-- Comparative policy experiments
-- Case study and integration backfeed
-- Production-grade cursor, auth integration, multi-tenant policy registry
+- Production platform adapter implementing `ApprovalStore`
+- Full evidence bundle browser
+- User study on operator utility vs strict omit
+- Opaque pagination and auth middleware
+- IPC adapter alternative to HTTP

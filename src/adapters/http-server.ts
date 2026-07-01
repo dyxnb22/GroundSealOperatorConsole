@@ -87,7 +87,16 @@ async function handleRequest(
         message: "tenantId query param required",
       });
     }
-    return sendJson(res, 200, store.getApprovalDetail(tenantId, decodeURIComponent(approvalMatch[1]!)));
+    const roleParam = url.searchParams.get("role");
+    const role =
+      roleParam === "viewer" || roleParam === "reviewer" || roleParam === "admin"
+        ? roleParam
+        : "reviewer";
+    return sendJson(
+      res,
+      200,
+      store.getApprovalDetail(tenantId, decodeURIComponent(approvalMatch[1]!), { role }),
+    );
   }
 
   const runMatch = path.match(/^\/api\/runs\/([^/]+)\/timeline$/);

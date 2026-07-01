@@ -40,7 +40,7 @@ export function App() {
       setLoading(true);
       setError(null);
       try {
-        const d = await fetchDetail(tenant.tenantId, approvalId);
+        const d = await fetchDetail(tenant.tenantId, approvalId, tenant.role);
         setDetail(d);
         setSelectedId(approvalId);
       } catch (e) {

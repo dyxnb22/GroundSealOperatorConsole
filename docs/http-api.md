@@ -18,7 +18,7 @@ Default: `http://127.0.0.1:3100`
 |--------|------|------|----------|
 | GET | `/health` | — | `{ status: "ok" }` |
 | POST | `/api/approvals/queue` | ApprovalQueueQuery | ApprovalQueueResponse |
-| GET | `/api/approvals/:id?tenantId=` | — | ApprovalDetail |
+| GET | `/api/approvals/:id?tenantId=&role=` | — | ApprovalDetail (role selects redaction policy) |
 | POST | `/api/approvals/:id/decision` | ApprovalDecisionRequest | ApprovalDecisionResponse |
 | POST | `/api/approvals/:id/resubmit` | ResubmitApprovalRequest | ResubmitApprovalResponse |
 | GET | `/api/runs/:runId/timeline?tenantId=` | — | RunTimeline |

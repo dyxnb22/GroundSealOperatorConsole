@@ -55,4 +55,23 @@ export const DEFAULT_PII_POLICY: RedactionPolicy = {
   ],
 };
 
+/** Alternative policy: maximum omission, minimum disclosure (Phase 8 experiment). */
+export const STRICT_OMIT_POLICY: RedactionPolicy = {
+  policyId: "strict-omit",
+  rules: [
+    { path: "applicant.email", action: "omit" },
+    { path: "applicant.phone", action: "omit" },
+    { path: "applicant.ssn", action: "omit" },
+    { path: "credentials.token", action: "omit" },
+    { path: "credentials.apiKey", action: "omit" },
+  ],
+};
+
+export const REDACTION_POLICIES = {
+  "default-pii": DEFAULT_PII_POLICY,
+  "strict-omit": STRICT_OMIT_POLICY,
+} as const;
+
+export type RedactionPolicyId = keyof typeof REDACTION_POLICIES;
+
 export type { RedactedField };

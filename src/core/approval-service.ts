@@ -1,3 +1,4 @@
+import type { OperatorRole } from "../contracts/tenant.js";
 import type {
   ApprovalDetail,
   ApprovalDecisionRequest,
@@ -42,9 +43,10 @@ export function getApprovalQueue(
 export function getApprovalDetail(
   tenantId: string,
   approvalId: string,
+  options?: { role?: OperatorRole },
   store: ApprovalStore = getDefaultStore(),
 ): ApprovalDetail {
-  return store.getApprovalDetail(tenantId, approvalId);
+  return store.getApprovalDetail(tenantId, approvalId, options);
 }
 
 export function getRunTimeline(

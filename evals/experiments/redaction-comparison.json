@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-01T13:17:12.833Z",
+  "experiment": "redaction-policy-comparison",
+  "corpusSize": 3,
+  "policies": [
+    {
+      "policyId": "default-pii",
+      "visibleFieldCount": 6,
+      "omittedFieldCount": 3,
+      "correlationFieldCount": 2,
+      "partialMaskCount": 2,
+      "leakCount": 0,
+      "operatorUtilityScore": 3
+    },
+    {
+      "policyId": "strict-omit",
+      "visibleFieldCount": 0,
+      "omittedFieldCount": 9,
+      "correlationFieldCount": 0,
+      "partialMaskCount": 0,
+      "leakCount": 0,
+      "operatorUtilityScore": 0
+    }
+  ],
+  "winner": {
+    "operatorUtility": "default-pii",
+    "minimumDisclosure": "strict-omit",
+    "recommendation": "role-based: reviewer→default-pii, viewer→strict-omit"
+  }
+}

@@ -12,7 +12,8 @@ import { assertTimelineOrdered } from "../contracts/run.js";
 import type { ResubmitApprovalRequest, ResubmitApprovalResponse } from "../contracts/resubmit.js";
 import { ResubmitApprovalRequestSchema } from "../contracts/resubmit.js";
 import { GsocError } from "../contracts/errors.js";
-import { DEFAULT_PII_POLICY } from "../contracts/redaction.js";
+import { resolvePolicyForRole } from "../policy/policy-registry.js";
+import type { OperatorRole } from "../contracts/tenant.js";
 import { buildRedactedView } from "../policy/redaction.js";
 import {
   transitionApprovalStatus,
@@ -214,7 +215,11 @@ export class MemoryStore implements ApprovalStore {
     };
   }
 
-  getApprovalDetail(tenantId: string, approvalId: string): ApprovalDetail {
+  getApprovalDetail(
+    tenantId: string,
+    approvalId: string,
+    options?: { role?: OperatorRole },
+  ): ApprovalDetail {
     const approval = this.approvals.get(approvalId);
     if (!approval || approval.tenantId !== tenantId) {
       throw new GsocError("NOT_FOUND", `Approval ${approvalId} not found`);
@@ -225,9 +230,12 @@ export class MemoryStore implements ApprovalStore {
       throw new GsocError("RUN_NOT_FOUND", `Run ${approval.runId} not found`);
     }
 
+    const role = options?.role ?? "reviewer";
+    const policy = resolvePolicyForRole(role);
+
     const redacted = buildRedactedView({
       payload: approval.rawPayload,
-      policy: DEFAULT_PII_POLICY,
+      policy,
     });
 
     return {

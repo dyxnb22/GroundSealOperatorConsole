@@ -55,16 +55,17 @@ A governed agent platform needs an interface that helps humans review, approve, 
 - `docs/evaluation-plan.md` — how quality and regressions will be measured.
 - `docs/failure-analysis-plan.md` — how failures are classified and reviewed.
 - `docs/execution-rhythm.md` — how to keep long-running agent work disciplined.
-- `docs/integration-contract.md` — how this project will plug back into larger systems.
+- `docs/integration-contract.md` — how this project plugs into larger systems.
+- [`docs/case-study.md`](docs/case-study.md) — Phase 9 build summary and lessons.
+- [`docs/integration-backfeed.md`](docs/integration-backfeed.md) — platform integration recommendations.
+- [`docs/experiments/redaction-policy-comparison.md`](docs/experiments/redaction-policy-comparison.md) — Phase 8 comparative experiment.
 - `docs/open-questions.md` — unresolved research and implementation questions.
 
 ## Current Stage
 
-**Phase 7 is complete.** HTTP adapter, file persistence, eval ratchet CI, and minimal React operator UI are in place. 50 tests passing.
+**Phases 0–9 complete.** Subsystem includes contracts, core, HTTP adapter, persistence, operator UI, redaction experiment, case study, and platform backfeed recommendations.
 
-**Phase 8 is next:** comparative experiments on redaction or approval policy approaches.
-
-See [`TASKS.md`](TASKS.md) and [`docs/roadmap.md`](docs/roadmap.md) for sequencing.
+See [`docs/case-study.md`](docs/case-study.md) and [`TASKS.md`](TASKS.md).
 
 ## Relationship To The Parent Platform
 

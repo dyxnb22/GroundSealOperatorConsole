@@ -40,7 +40,12 @@ function maskValue(value: unknown): string {
       const domain = parts[1] ?? "";
       const maskedLocal =
         local.length <= 1 ? "*" : `${local[0]}${"*".repeat(Math.min(local.length - 1, 3))}`;
-      return `${maskedLocal}@${domain}`;
+      const domainParts = domain.split(".");
+      const maskedDomain =
+        domainParts.length > 1
+          ? `[domain].${domainParts[domainParts.length - 1]}`
+          : "[domain]";
+      return `${maskedLocal}@${maskedDomain}`;
     }
     return "[REDACTED]";
   }

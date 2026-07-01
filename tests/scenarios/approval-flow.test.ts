@@ -52,12 +52,12 @@ describe("Approval flow scenarios", () => {
     expect(decision.status).toBe("rejected");
   });
 
-  it("TenantIsolation: cross-tenant detail access denied", () => {
+  it("TenantIsolation: cross-tenant detail denied", () => {
     expect(() => getApprovalDetail("tenant-a", "apr-003")).toThrow(GsocError);
     try {
       getApprovalDetail("tenant-a", "apr-003");
     } catch (e) {
-      expect((e as GsocError).code).toBe("NOT_FOUND");
+      expect((e as GsocError).code).toBe("TENANT_ACCESS_DENIED");
     }
   });
 

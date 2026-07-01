@@ -2,13 +2,19 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { ErrorCodeSchema, GsocError } from "../../src/contracts/errors.js";
 import { ERROR_TAXONOMY } from "../../src/policy/error-taxonomy.js";
 import { buildRedactedView } from "../../src/policy/redaction.js";
+import { MemoryStore } from "../../src/adapters/memory-store.js";
 import {
-  MemoryStore,
   parseApprovalQueueQuery,
   parseApprovalDecisionRequest,
   parseResubmitRequest,
-} from "../../src/adapters/memory-store.js";
-import { resetDefaultStore, getApprovalDetail, submitApprovalDecision, resubmitApproval } from "../../src/core/approval-service.js";
+} from "../../src/core/validation.js";
+import {
+  resetDefaultStore,
+  getApprovalDetail,
+  getApprovalQueue,
+  submitApprovalDecision,
+  resubmitApproval,
+} from "../../src/core/approval-service.js";
 import { ApprovalDecisionRequestSchema } from "../../src/contracts/approval.js";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -48,6 +54,17 @@ describe("ErrorCode negative-path coverage", () => {
     );
   });
 
+  it("INVALID_QUERY: invalid pagination cursor", () => {
+    expectCode(
+      () =>
+        getApprovalQueue({
+          tenantContext: { tenantId: "tenant-a", role: "reviewer" },
+          cursor: "not-a-number",
+        }),
+      "INVALID_QUERY",
+    );
+  });
+
   it("INVALID_TENANT_CONTEXT: empty tenantId", () => {
     expectCode(
       () =>
@@ -60,6 +77,10 @@ describe("ErrorCode negative-path coverage", () => {
 
   it("NOT_FOUND: missing approval", () => {
     expectCode(() => getApprovalDetail("tenant-a", "missing"), "NOT_FOUND");
+  });
+
+  it("TENANT_ACCESS_DENIED: cross-tenant approval", () => {
+    expectCode(() => getApprovalDetail("tenant-a", "apr-003"), "TENANT_ACCESS_DENIED");
   });
 
   it("RUN_NOT_FOUND: approval with broken run reference", () => {
@@ -98,6 +119,19 @@ describe("ErrorCode negative-path coverage", () => {
             tenantContext: { tenantId: "tenant-a", operatorId: "v1", role: "viewer" },
             approvalId: "apr-001",
             decision: "approve",
+          }),
+        ),
+      "INSUFFICIENT_ROLE",
+    );
+  });
+
+  it("INSUFFICIENT_ROLE: viewer cannot resubmit", () => {
+    expectCode(
+      () =>
+        resubmitApproval(
+          parseResubmitRequest({
+            tenantContext: { tenantId: "tenant-a", role: "viewer" },
+            approvalId: "apr-004",
           }),
         ),
       "INSUFFICIENT_ROLE",
@@ -155,5 +189,28 @@ describe("ErrorCode negative-path coverage", () => {
     );
     expect(result.status).toBe("pending");
     expect(getApprovalDetail("tenant-a", "apr-004").status).toBe("pending");
+  });
+});
+
+describe("Queue pagination", () => {
+  beforeEach(() => resetDefaultStore());
+
+  it("returns nextCursor and second page", () => {
+    const page1 = getApprovalQueue({
+      tenantContext: { tenantId: "tenant-a", role: "reviewer" },
+      status: "all",
+      limit: 2,
+    });
+    expect(page1.items).toHaveLength(2);
+    expect(page1.nextCursor).toBe("2");
+
+    const page2 = getApprovalQueue({
+      tenantContext: { tenantId: "tenant-a", role: "reviewer" },
+      status: "all",
+      limit: 2,
+      cursor: page1.nextCursor!,
+    });
+    expect(page2.items.length).toBeGreaterThan(0);
+    expect(page2.items[0]!.approvalId).not.toBe(page1.items[0]!.approvalId);
   });
 });

@@ -1,8 +1,9 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { dirname } from "node:path";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { MemoryStore } from "./memory-store.js";
-import type { ApprovalStore } from "./store-interface.js";
+import type { ApprovalStore, DetailOptions } from "./store-interface.js";
 import type { StoreSnapshot } from "./store-types.js";
+import { parseStoreSnapshot } from "./store-schema.js";
 import { GsocError } from "../contracts/errors.js";
 
 export class FileStore implements ApprovalStore {
@@ -25,9 +26,16 @@ export class FileStore implements ApprovalStore {
   private load(): StoreSnapshot {
     try {
       const raw = readFileSync(this.filePath, "utf-8");
-      return JSON.parse(raw) as StoreSnapshot;
-    } catch {
-      throw new GsocError("INVALID_QUERY", `Failed to load store from ${this.filePath}`);
+      const parsed = parseStoreSnapshot(JSON.parse(raw));
+      if (!parsed.success) {
+        throw new GsocError("STORE_LOAD_FAILED", parsed.error.message);
+      }
+      return parsed.data;
+    } catch (error) {
+      if (error instanceof GsocError) {
+        throw error;
+      }
+      throw new GsocError("STORE_LOAD_FAILED", `Failed to load store from ${this.filePath}`);
     }
   }
 
@@ -36,7 +44,9 @@ export class FileStore implements ApprovalStore {
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true });
     }
-    writeFileSync(this.filePath, JSON.stringify(this.inner.snapshot(), null, 2), "utf-8");
+    const tmpPath = join(dir, `.${this.filePath.split("/").pop()}.tmp`);
+    writeFileSync(tmpPath, JSON.stringify(this.inner.snapshot(), null, 2), "utf-8");
+    renameSync(tmpPath, this.filePath);
   }
 
   getApprovalQueue(...args: Parameters<ApprovalStore["getApprovalQueue"]>) {
@@ -46,7 +56,7 @@ export class FileStore implements ApprovalStore {
   getApprovalDetail(
     tenantId: string,
     approvalId: string,
-    options?: { role?: import("../contracts/tenant.js").OperatorRole },
+    options?: DetailOptions,
   ) {
     return this.inner.getApprovalDetail(tenantId, approvalId, options);
   }

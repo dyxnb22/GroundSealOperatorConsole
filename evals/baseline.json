@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-01T13:17:14.166Z",
+  "generatedAt": "2026-07-01T13:24:48.377Z",
   "testFiles": 9,
-  "testsPassed": 58,
+  "testsPassed": 68,
   "testsFailed": 0,
   "contractPassRate": 1,
   "negativePathCorrectness": 1,
-  "errorCodeCount": 11,
+  "errorCodeCount": 12,
   "evaluationCategories": [
     "ContractValidation",
     "TenantIsolation",

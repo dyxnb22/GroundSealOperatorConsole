@@ -4,8 +4,13 @@ import {
   parseApprovalQueueQuery,
   parseApprovalDecisionRequest,
   parseResubmitRequest,
-} from "./memory-store.js";
+  parseOperatorRole,
+  assertPathBodyIdMatch,
+} from "../core/validation.js";
 import { toErrorResponse, isGsocError } from "../policy/error-taxonomy.js";
+import { GsocError } from "../contracts/errors.js";
+
+const MAX_BODY_BYTES = 1_048_576;
 
 export interface HttpServerOptions {
   store: ApprovalStore;
@@ -61,6 +66,8 @@ async function handleRequest(
   if (method === "POST" && decisionMatch) {
     const body = await readBody(req);
     const request = parseApprovalDecisionRequest(body);
+    const pathId = decodeURIComponent(decisionMatch[1]!);
+    assertPathBodyIdMatch(pathId, request.approvalId, "approvalId");
     return sendJson(res, 200, store.submitApprovalDecision(request));
   }
 
@@ -69,12 +76,7 @@ async function handleRequest(
     const body = await readBody(req);
     const request = parseResubmitRequest(body);
     const pathId = decodeURIComponent(resubmitMatch[1]!);
-    if (request.approvalId !== pathId) {
-      return sendJson(res, 400, {
-        code: "INVALID_QUERY",
-        message: "approvalId in path and body must match",
-      });
-    }
+    assertPathBodyIdMatch(pathId, request.approvalId, "approvalId");
     return sendJson(res, 200, store.resubmitApproval(request));
   }
 
@@ -87,16 +89,16 @@ async function handleRequest(
         message: "tenantId query param required",
       });
     }
-    const roleParam = url.searchParams.get("role");
-    const role =
-      roleParam === "viewer" || roleParam === "reviewer" || roleParam === "admin"
-        ? roleParam
-        : "reviewer";
-    return sendJson(
-      res,
-      200,
-      store.getApprovalDetail(tenantId, decodeURIComponent(approvalMatch[1]!), { role }),
-    );
+    try {
+      const role = parseOperatorRole(url.searchParams.get("role"));
+      return sendJson(
+        res,
+        200,
+        store.getApprovalDetail(tenantId, decodeURIComponent(approvalMatch[1]!), { role }),
+      );
+    } catch (error) {
+      return sendError(res, 400, error);
+    }
   }
 
   const runMatch = path.match(/^\/api\/runs\/([^/]+)\/timeline$/);
@@ -117,7 +119,18 @@ async function handleRequest(
 function readBody(req: IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
-    req.on("data", (chunk: Buffer) => chunks.push(chunk));
+    let total = 0;
+
+    req.on("data", (chunk: Buffer) => {
+      total += chunk.length;
+      if (total > MAX_BODY_BYTES) {
+        reject(new GsocError("INVALID_QUERY", "Request body too large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+
     req.on("end", () => {
       const raw = Buffer.concat(chunks).toString("utf-8");
       if (!raw) {
@@ -127,7 +140,7 @@ function readBody(req: IncomingMessage): Promise<unknown> {
       try {
         resolve(JSON.parse(raw));
       } catch {
-        reject(new Error("Invalid JSON body"));
+        reject(new GsocError("INVALID_QUERY", "Invalid JSON body"));
       }
     });
     req.on("error", reject);
@@ -142,11 +155,12 @@ function sendJson(res: ServerResponse, status: number, body: unknown): void {
 function sendError(res: ServerResponse, status: number, error: unknown): void {
   const payload = toErrorResponse(error);
   const httpStatus = isGsocError(error)
-    ? error.code === "NOT_FOUND"
+    ? error.code === "NOT_FOUND" || error.code === "RUN_NOT_FOUND"
       ? 404
       : error.code.startsWith("INVALID") ||
           error.code === "INSUFFICIENT_ROLE" ||
-          error.code === "TENANT_ACCESS_DENIED"
+          error.code === "TENANT_ACCESS_DENIED" ||
+          error.code === "STORE_LOAD_FAILED"
         ? 400
         : 422
     : status;

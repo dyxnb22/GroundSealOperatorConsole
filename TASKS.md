@@ -20,7 +20,13 @@ See [`docs/roadmap.md`](docs/roadmap.md) and git history.
 
 ## Project complete (Phases 0–9)
 
-All roadmap phases through case study and backfeed are documented and tested. Future work is optional extension (production adapter, full evidence UI, user studies).
+All roadmap phases documented and tested. Post-review polish tracked in [`docs/code-review-polish.md`](docs/code-review-polish.md).
+
+## Optional follow-ups
+
+- Production `ApprovalStore` adapter for parent platform DB
+- User study validating redaction utility heuristic
+- Full evidence bundle browser
 
 ## Sequencing Rules
 

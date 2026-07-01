@@ -30,6 +30,9 @@ describe("RedactionSafety", () => {
     expect(response.fields.find((f) => f.path === "applicant.email")?.value).not.toBe(
       "alex@example.com",
     );
+    expect(response.fields.find((f) => f.path === "applicant.email")?.value).not.toContain(
+      "example.com",
+    );
 
     assertNoPlaintextLeak(response, fixture.expectedSensitiveValues);
   });

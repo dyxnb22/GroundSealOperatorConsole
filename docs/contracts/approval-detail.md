@@ -46,9 +46,9 @@ ApprovalDetail is read-only. Mutations go through ApprovalDecision.
 
 | Code | When |
 |------|------|
-| NOT_FOUND | Approval absent or wrong tenant |
+| NOT_FOUND | Approval absent in tenant scope |
 | INVALID_TENANT_CONTEXT | Bad tenant context |
-| TENANT_ACCESS_DENIED | Cross-tenant access |
+| TENANT_ACCESS_DENIED | Approval exists but belongs to another tenant |
 | RUN_NOT_FOUND | runId missing for tenant |
 
 ## Example

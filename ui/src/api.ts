@@ -6,9 +6,15 @@ export interface TenantContext {
   role: "viewer" | "reviewer" | "admin";
 }
 
+export type ApprovalStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "changes_requested";
+
 export interface ApprovalQueueItem {
   approvalId: string;
-  status: string;
+  status: ApprovalStatus;
   subject: string;
   runId: string;
   createdAt: string;

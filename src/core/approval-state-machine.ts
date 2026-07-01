@@ -47,14 +47,3 @@ export function transitionResubmitStatus(current: ApprovalStatus): ApprovalStatu
   }
   return "pending";
 }
-
-export function decisionToStatus(decision: ApprovalDecisionType): ApprovalStatus {
-  switch (decision) {
-    case "approve":
-      return "approved";
-    case "reject":
-      return "rejected";
-    case "request_changes":
-      return "changes_requested";
-  }
-}

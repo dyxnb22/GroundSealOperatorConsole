@@ -6,27 +6,26 @@ import type {
   ApprovalDecisionRequest,
   ApprovalDecisionResponse,
 } from "../contracts/approval.js";
-import { ApprovalQueueQuerySchema, ApprovalDecisionRequestSchema } from "../contracts/approval.js";
 import type { RunTimeline } from "../contracts/run.js";
 import { assertTimelineOrdered } from "../contracts/run.js";
 import type { ResubmitApprovalRequest, ResubmitApprovalResponse } from "../contracts/resubmit.js";
-import { ResubmitApprovalRequestSchema } from "../contracts/resubmit.js";
 import { GsocError } from "../contracts/errors.js";
 import { resolvePolicyForRole } from "../policy/policy-registry.js";
-import type { OperatorRole } from "../contracts/tenant.js";
 import { buildRedactedView } from "../policy/redaction.js";
 import {
   transitionApprovalStatus,
   transitionResubmitStatus,
 } from "../core/approval-state-machine.js";
 import { assertCanDecide } from "../contracts/tenant.js";
-import type { ApprovalStore } from "./store-interface.js";
+import type { ApprovalStore, DetailOptions } from "./store-interface.js";
 import type {
   AuditEntry,
   InternalApproval,
   InternalRun,
   StoreSnapshot,
 } from "./store-types.js";
+import { parseStoreSnapshot } from "./store-schema.js";
+import { assertTenantMatch, parseCursorOffset, nextCursor } from "./tenant-access.js";
 
 export function seedData(): {
   approvals: InternalApproval[];
@@ -197,7 +196,7 @@ export class MemoryStore implements ApprovalStore {
   }
 
   getApprovalQueue(query: ApprovalQueueQuery): ApprovalQueueResponse {
-    const { tenantContext, status, limit } = query;
+    const { tenantContext, status, limit, cursor } = query;
     let items = [...this.approvals.values()].filter(
       (a) => a.tenantId === tenantContext.tenantId,
     );
@@ -207,59 +206,58 @@ export class MemoryStore implements ApprovalStore {
     }
 
     items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    const page = items.slice(0, limit).map((a) => toQueueItem(a));
+
+    const offset = parseCursorOffset(cursor);
+    const page = items.slice(offset, offset + limit).map((a) => toQueueItem(a));
 
     return {
       items: page,
-      nextCursor: items.length > limit ? String(limit) : null,
+      nextCursor: nextCursor(offset, limit, items.length),
     };
   }
 
   getApprovalDetail(
     tenantId: string,
     approvalId: string,
-    options?: { role?: OperatorRole },
+    options?: DetailOptions,
   ): ApprovalDetail {
     const approval = this.approvals.get(approvalId);
-    if (!approval || approval.tenantId !== tenantId) {
-      throw new GsocError("NOT_FOUND", `Approval ${approvalId} not found`);
-    }
+    assertTenantMatch(approval?.tenantId, tenantId, `Approval ${approvalId}`);
 
-    const run = this.runs.get(approval.runId);
-    if (!run || run.tenantId !== tenantId) {
-      throw new GsocError("RUN_NOT_FOUND", `Run ${approval.runId} not found`);
+    const run = this.runs.get(approval!.runId);
+    if (!run) {
+      throw new GsocError("RUN_NOT_FOUND", `Run ${approval!.runId} not found`);
     }
+    assertTenantMatch(run.tenantId, tenantId, `Run ${approval!.runId}`);
 
     const role = options?.role ?? "reviewer";
     const policy = resolvePolicyForRole(role);
 
     const redacted = buildRedactedView({
-      payload: approval.rawPayload,
+      payload: approval!.rawPayload,
       policy,
     });
 
     return {
-      approvalId: approval.approvalId,
-      tenantId: approval.tenantId,
-      status: approval.status,
-      subject: approval.subject,
-      runId: approval.runId,
-      evidenceBundleIds: approval.evidenceBundleIds,
-      requestedAction: approval.requestedAction,
-      createdAt: approval.createdAt,
-      updatedAt: approval.updatedAt,
+      approvalId: approval!.approvalId,
+      tenantId: approval!.tenantId,
+      status: approval!.status,
+      subject: approval!.subject,
+      runId: approval!.runId,
+      evidenceBundleIds: approval!.evidenceBundleIds,
+      requestedAction: approval!.requestedAction,
+      createdAt: approval!.createdAt,
+      updatedAt: approval!.updatedAt,
       redactedPreview: redacted.fields,
     };
   }
 
   getRunTimeline(tenantId: string, runId: string): RunTimeline {
     const run = this.runs.get(runId);
-    if (!run || run.tenantId !== tenantId) {
-      throw new GsocError("NOT_FOUND", `Run ${runId} not found`);
-    }
+    assertTenantMatch(run?.tenantId, tenantId, `Run ${runId}`);
 
-    assertTimelineOrdered(run.timeline.events);
-    return run.timeline;
+    assertTimelineOrdered(run!.timeline.events);
+    return run!.timeline;
   }
 
   submitApprovalDecision(
@@ -269,21 +267,19 @@ export class MemoryStore implements ApprovalStore {
     assertCanDecide(tenantContext.role);
 
     const approval = this.approvals.get(approvalId);
-    if (!approval || approval.tenantId !== tenantContext.tenantId) {
-      throw new GsocError("NOT_FOUND", `Approval ${approvalId} not found`);
-    }
+    assertTenantMatch(approval?.tenantId, tenantContext.tenantId, `Approval ${approvalId}`);
 
-    const nextStatus = transitionApprovalStatus(approval.status, decision);
+    const nextStatus = transitionApprovalStatus(approval!.status, decision);
     const decidedAt = new Date().toISOString();
     const decidedBy = tenantContext.operatorId ?? "unknown-operator";
     const auditRef = `audit-${approvalId}-${Date.now()}`;
 
-    approval.status = nextStatus;
-    approval.updatedAt = decidedAt;
-    approval.decidedAt = decidedAt;
-    approval.decidedBy = decidedBy;
-    approval.auditRef = auditRef;
-    this.approvals.set(approvalId, approval);
+    approval!.status = nextStatus;
+    approval!.updatedAt = decidedAt;
+    approval!.decidedAt = decidedAt;
+    approval!.decidedBy = decidedBy;
+    approval!.auditRef = auditRef;
+    this.approvals.set(approvalId, approval!);
 
     this.auditLog.push({
       auditRef,
@@ -305,17 +301,15 @@ export class MemoryStore implements ApprovalStore {
     }
 
     const approval = this.approvals.get(approvalId);
-    if (!approval || approval.tenantId !== tenantContext.tenantId) {
-      throw new GsocError("NOT_FOUND", `Approval ${approvalId} not found`);
-    }
+    assertTenantMatch(approval?.tenantId, tenantContext.tenantId, `Approval ${approvalId}`);
 
-    const nextStatus = transitionResubmitStatus(approval.status);
+    const nextStatus = transitionResubmitStatus(approval!.status);
     const resubmittedAt = new Date().toISOString();
     const auditRef = `audit-resubmit-${approvalId}-${Date.now()}`;
 
-    approval.status = nextStatus;
-    approval.updatedAt = resubmittedAt;
-    this.approvals.set(approvalId, approval);
+    approval!.status = nextStatus;
+    approval!.updatedAt = resubmittedAt;
+    this.approvals.set(approvalId, approval!);
 
     this.auditLog.push({
       auditRef,
@@ -332,20 +326,30 @@ export class MemoryStore implements ApprovalStore {
   snapshot(): StoreSnapshot {
     return {
       version: 1,
-      approvals: [...this.approvals.values()],
+      approvals: [...this.approvals.values()].map(cloneApproval),
       runs: [...this.runs.values()],
       auditLog: [...this.auditLog],
     };
   }
 
   restore(snapshot: StoreSnapshot): void {
-    if (snapshot.version !== 1) {
-      throw new GsocError("INVALID_QUERY", `Unsupported snapshot version: ${snapshot.version}`);
+    const parsed = parseStoreSnapshot(snapshot);
+    if (!parsed.success) {
+      throw new GsocError("STORE_LOAD_FAILED", parsed.error.message);
     }
-    this.approvals = new Map(snapshot.approvals.map((a) => [a.approvalId, { ...a }]));
-    this.runs = new Map(snapshot.runs.map((r) => [r.runId, r]));
-    this.auditLog = [...snapshot.auditLog];
+    const data = parsed.data;
+    this.approvals = new Map(data.approvals.map((a) => [a.approvalId, cloneApproval(a)]));
+    this.runs = new Map(data.runs.map((r) => [r.runId, r]));
+    this.auditLog = [...data.auditLog];
   }
+}
+
+function cloneApproval(approval: InternalApproval): InternalApproval {
+  return {
+    ...approval,
+    evidenceBundleIds: [...approval.evidenceBundleIds],
+    rawPayload: structuredClone(approval.rawPayload),
+  };
 }
 
 function toQueueItem(approval: InternalApproval): ApprovalQueueItem {
@@ -358,42 +362,3 @@ function toQueueItem(approval: InternalApproval): ApprovalQueueItem {
     summary: approval.requestedAction,
   };
 }
-
-export function parseApprovalQueueQuery(raw: unknown): ApprovalQueueQuery {
-  const result = ApprovalQueueQuerySchema.safeParse(raw);
-  if (!result.success) {
-    const emptyTenant = result.error.issues.some(
-      (i) =>
-        i.path.join(".") === "tenantContext.tenantId" &&
-        (i.code === "too_small" || i.code === "invalid_type"),
-    );
-    throw new GsocError(
-      emptyTenant ? "INVALID_TENANT_CONTEXT" : "INVALID_QUERY",
-      result.error.message,
-    );
-  }
-  return result.data;
-}
-
-export function parseApprovalDecisionRequest(raw: unknown): ApprovalDecisionRequest {
-  const result = ApprovalDecisionRequestSchema.safeParse(raw);
-  if (!result.success) {
-    const reasonIssue = result.error.issues.find((i) => i.path.join(".") === "reason");
-    throw new GsocError(
-      reasonIssue ? "INVALID_DECISION" : "INVALID_QUERY",
-      result.error.message,
-    );
-  }
-  return result.data;
-}
-
-export function parseResubmitRequest(raw: unknown): ResubmitApprovalRequest {
-  const result = ResubmitApprovalRequestSchema.safeParse(raw);
-  if (!result.success) {
-    throw new GsocError("INVALID_QUERY", result.error.message);
-  }
-  return result.data;
-}
-
-/** @deprecated Use MemoryStore */
-export { MemoryStore as FixtureStore };

@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { FileStore } from "../../src/adapters/file-store.js";
 import { replaySnapshot } from "../../src/core/replay.js";
 import { ApprovalDecisionRequestSchema } from "../../src/contracts/approval.js";
+import { GsocError } from "../../src/contracts/errors.js";
 
 describe("FileStore persistence and replay", () => {
   let dir: string;
@@ -41,6 +42,17 @@ describe("FileStore persistence and replay", () => {
     const snapshot = store.snapshot();
     const result = replaySnapshot(snapshot);
     expect(result.matchesBaseline).toBe(true);
+    expect(result.diffs).toHaveLength(0);
     expect(result.approvalCount).toBeGreaterThan(0);
+  });
+
+  it("throws STORE_LOAD_FAILED on corrupt file", () => {
+    writeFileSync(filePath, "{ corrupt", "utf-8");
+    expect(() => new FileStore(filePath)).toThrow(GsocError);
+    try {
+      new FileStore(filePath);
+    } catch (e) {
+      expect((e as GsocError).code).toBe("STORE_LOAD_FAILED");
+    }
   });
 });

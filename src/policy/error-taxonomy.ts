@@ -17,12 +17,12 @@ export const ERROR_TAXONOMY: Record<
   },
   TENANT_ACCESS_DENIED: {
     category: "TenantIsolation",
-    trigger: "Explicit cross-tenant denial (reserved for auth layer)",
+    trigger: "Resource exists under another tenant",
     failMode: "closed",
   },
   NOT_FOUND: {
     category: "NegativePath",
-    trigger: "Resource absent or wrong tenant scope",
+    trigger: "Resource absent in tenant scope",
     failMode: "closed",
   },
   RUN_NOT_FOUND: {
@@ -58,6 +58,11 @@ export const ERROR_TAXONOMY: Record<
   PAYLOAD_TOO_DEEP: {
     category: "RedactionSafety",
     trigger: "Nested payload exceeds max depth",
+    failMode: "closed",
+  },
+  STORE_LOAD_FAILED: {
+    category: "NegativePath",
+    trigger: "Persisted store file corrupt or unreadable",
     failMode: "closed",
   },
 };

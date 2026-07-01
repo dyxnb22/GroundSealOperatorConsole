@@ -1,11 +1,15 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { RedactionPolicy } from "../contracts/redaction.js";
-import { DEFAULT_PII_POLICY, STRICT_OMIT_POLICY } from "../contracts/redaction.js";
+import { listRegisteredPolicies, resolvePolicyById } from "../policy/policy-registry.js";
 import {
   buildRedactedView,
   assertNoPlaintextLeak,
 } from "../policy/redaction.js";
+
+const POLICIES: RedactionPolicy[] = listRegisteredPolicies().map((id) =>
+  resolvePolicyById(id),
+);
 
 export interface RedactionCorpusEntry {
   id: string;
@@ -32,8 +36,6 @@ export interface ComparisonResult {
     recommendation: string;
   };
 }
-
-const POLICIES: RedactionPolicy[] = [DEFAULT_PII_POLICY, STRICT_OMIT_POLICY];
 
 export function loadRedactionCorpus(): RedactionCorpusEntry[] {
   const fixturePath = join(process.cwd(), "fixtures/experiments/redaction-corpus.json");

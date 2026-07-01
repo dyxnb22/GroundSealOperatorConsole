@@ -1,4 +1,3 @@
-import type { OperatorRole } from "../contracts/tenant.js";
 import type {
   ApprovalDetail,
   ApprovalDecisionRequest,
@@ -7,13 +6,17 @@ import type {
 } from "../contracts/approval.js";
 import type { RunTimeline } from "../contracts/run.js";
 import type { ResubmitApprovalRequest, ResubmitApprovalResponse } from "../contracts/resubmit.js";
-import type { ApprovalStore } from "../adapters/store-interface.js";
+import type { ApprovalStore, DetailOptions } from "../adapters/store-interface.js";
 import { MemoryStore } from "../adapters/memory-store.js";
 import {
   parseApprovalQueueQuery,
   parseApprovalDecisionRequest,
   parseResubmitRequest,
-} from "../adapters/memory-store.js";
+} from "../core/validation.js";
+
+export interface ServiceContext {
+  store?: ApprovalStore;
+}
 
 let defaultStore: ApprovalStore | undefined;
 
@@ -32,43 +35,47 @@ export function resetDefaultStore(): void {
   defaultStore = new MemoryStore();
 }
 
+function resolveStore(ctx?: ServiceContext): ApprovalStore {
+  return ctx?.store ?? getDefaultStore();
+}
+
 export function getApprovalQueue(
   rawQuery: unknown,
-  store: ApprovalStore = getDefaultStore(),
+  ctx?: ServiceContext,
 ): ApprovalQueueResponse {
   const query = parseApprovalQueueQuery(rawQuery);
-  return store.getApprovalQueue(query);
+  return resolveStore(ctx).getApprovalQueue(query);
 }
 
 export function getApprovalDetail(
   tenantId: string,
   approvalId: string,
-  options?: { role?: OperatorRole },
-  store: ApprovalStore = getDefaultStore(),
+  options?: DetailOptions,
+  ctx?: ServiceContext,
 ): ApprovalDetail {
-  return store.getApprovalDetail(tenantId, approvalId, options);
+  return resolveStore(ctx).getApprovalDetail(tenantId, approvalId, options);
 }
 
 export function getRunTimeline(
   tenantId: string,
   runId: string,
-  store: ApprovalStore = getDefaultStore(),
+  ctx?: ServiceContext,
 ): RunTimeline {
-  return store.getRunTimeline(tenantId, runId);
+  return resolveStore(ctx).getRunTimeline(tenantId, runId);
 }
 
 export function submitApprovalDecision(
   request: ApprovalDecisionRequest,
-  store: ApprovalStore = getDefaultStore(),
+  ctx?: ServiceContext,
 ): ApprovalDecisionResponse {
-  return store.submitApprovalDecision(request);
+  return resolveStore(ctx).submitApprovalDecision(request);
 }
 
 export function resubmitApproval(
   request: ResubmitApprovalRequest,
-  store: ApprovalStore = getDefaultStore(),
+  ctx?: ServiceContext,
 ): ResubmitApprovalResponse {
-  return store.resubmitApproval(request);
+  return resolveStore(ctx).resubmitApproval(request);
 }
 
 export {

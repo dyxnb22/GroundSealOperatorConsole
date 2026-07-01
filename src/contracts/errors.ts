@@ -12,6 +12,7 @@ export const ErrorCodeSchema = z.enum([
   "MALFORMED_TIMELINE",
   "INVALID_POLICY",
   "PAYLOAD_TOO_DEEP",
+  "STORE_LOAD_FAILED",
 ]);
 
 export type ErrorCode = z.infer<typeof ErrorCodeSchema>;

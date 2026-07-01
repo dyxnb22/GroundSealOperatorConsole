@@ -1,0 +1,31 @@
+{
+  "payload": {
+    "applicant": {
+      "name": "Alex Operator",
+      "email": "alex@example.com",
+      "phone": "555-0100",
+      "ssn": "123-45-6789"
+    },
+    "credentials": {
+      "token": "secret-token-abc",
+      "apiKey": "key-xyz-789"
+    }
+  },
+  "policy": {
+    "policyId": "default-pii",
+    "rules": [
+      { "path": "applicant.email", "action": "mask" },
+      { "path": "applicant.phone", "action": "mask" },
+      { "path": "applicant.ssn", "action": "omit" },
+      { "path": "credentials.token", "action": "omit" },
+      { "path": "credentials.apiKey", "action": "hash" }
+    ]
+  },
+  "expectedSensitiveValues": [
+    "123-45-6789",
+    "secret-token-abc",
+    "alex@example.com",
+    "555-0100",
+    "key-xyz-789"
+  ]
+}

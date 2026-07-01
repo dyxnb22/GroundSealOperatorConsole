@@ -1,0 +1,9 @@
+{
+  "tenantContext": {
+    "tenantId": "tenant-a",
+    "operatorId": "op-alex",
+    "role": "reviewer"
+  },
+  "status": "pending",
+  "limit": 20
+}

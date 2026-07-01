@@ -13,16 +13,18 @@ boundaries, main components, and integration seams.
 
 ## Conceptual Components
 
+See [`docs/glossary.md`](glossary.md) for canonical terms. Layers map to public contracts in [`docs/contracts/`](contracts/README.md).
+
 1. Contract layer
-   Defines the public types, state transitions, and validation rules.
+   Defines public types: ApprovalQueueQuery, ApprovalDetail, ApprovalDecision, RunTimeline, RedactedPresentation. Implemented in `src/contracts/`.
 2. Policy and invariants layer
-   Encodes what must always hold true even when the implementation evolves.
+   RedactionPolicy, approval state transitions, tenant isolation. Implemented in `src/policy/`.
 3. Execution layer
-   Performs the subsystem's work while staying inside policy and contract boundaries.
+   Approval queue, detail, and decision handlers; state machine. Implemented in `src/core/`.
 4. Evidence layer
-   Captures decisions, outputs, and verification artifacts where relevant.
+   EvidenceBundle and EvidenceItem references; decision audit records. Consumed via adapter, surfaced in ApprovalDetail.
 5. Integration adapter layer
-   Keeps parent-system coupling thin and explicit.
+   Thin boundary to parent platform; Phase 2 uses `src/adapters/fixture-store.ts` for deterministic local mode.
 
 ## Trust Boundaries
 

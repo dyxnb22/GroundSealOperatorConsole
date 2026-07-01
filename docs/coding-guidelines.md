@@ -12,6 +12,17 @@ These guidelines apply once implementation begins in GroundSealOperatorConsole.
 - Prefer small modules with single responsibilities.
 - Write comments only where reasoning or invariants are non-obvious.
 
+## Directory Conventions (Phase 1+)
+
+| Path | Responsibility |
+|------|----------------|
+| `src/contracts/` | Zod schemas and public TypeScript types |
+| `src/policy/` | Redaction engine and invariant helpers |
+| `src/core/` | State machine and service orchestration |
+| `src/adapters/` | Fixture store and future platform adapters |
+| `fixtures/scenarios/` | Deterministic JSON fixtures for docs and tests |
+| `tests/` | Mirrors src layout; scenario tests under `tests/scenarios/` |
+
 ## Test Rules
 
 - Add tests proportional to risk and blast radius.

@@ -1,28 +1,46 @@
 # TASKS.md
 
-## Now
+## Phase 0 — Complete
 
-- Tighten the subsystem glossary and boundary language across all docs.
-- Define the minimal contract set required before implementation begins.
-- Write initial evaluation case categories and failure buckets.
-- Identify which assumptions come from the parent platform and which belong here.
-- Specify a minimal local development shape that does not overcommit future architecture.
+- [x] Glossary and boundary language ([`docs/glossary.md`](docs/glossary.md))
+- [x] Five public contracts with example JSON ([`docs/contracts/`](docs/contracts/README.md))
+- [x] Evaluation categories and failure buckets ([`docs/evaluation-plan.md`](docs/evaluation-plan.md))
+- [x] Assumption split ([`docs/integration-contract.md`](docs/integration-contract.md))
+- [x] Local dev shape ([`docs/local-dev.md`](docs/local-dev.md))
 
-## Next
+## Phase 1 — Complete
 
-- Turn core concepts into typed schemas and protocol drafts.
-- Define the first deterministic test and evaluation fixtures.
-- Draft a minimal implementation slice for the first roadmap phase.
-- Document expected failure modes and observable signals.
-- Define the first integration handshake back to a parent workflow.
+- [x] TypeScript project: package.json, tsconfig, vitest
+- [x] Zod schemas in `src/contracts/`
+- [x] Domain model doc ([`docs/domain-model.md`](docs/domain-model.md))
+- [x] Seven scenario fixtures under `fixtures/scenarios/`
+- [x] Schema parse tests (`tests/contracts/fixtures.test.ts`)
 
-## Later
+## Phase 2 — Complete
 
-- Implement the minimal viable runtime slice for this subsystem.
-- Expand evaluation depth and regression ratchets.
-- Test integration boundaries under failure conditions.
-- Compare at least two architectural approaches where tradeoffs are real.
-- Produce a concise case-study style summary once the subsystem is credible.
+- [x] Approval state machine (`src/core/approval-state-machine.ts`)
+- [x] Fixture adapter (`src/adapters/fixture-store.ts`)
+- [x] Queue, detail, decision service (`src/core/approval-service.ts`)
+- [x] Redaction policy engine (`src/policy/redaction.ts`)
+- [x] End-to-end scenario tests (`tests/scenarios/approval-flow.test.ts`)
+- [x] Known limitations ([`docs/known-limitations.md`](docs/known-limitations.md))
+
+## Now (Phase 3)
+
+- [ ] Expand negative-path regression suite with unified ErrorCode coverage
+- [ ] Add failure record template usage for any new issues found
+- [ ] Document resubmit handshake assumptions for platform adapter
+
+## Next (Phase 4)
+
+- [ ] Establish eval baseline snapshot (`evals/baseline.json`)
+- [ ] Wire CI test ratchet for contract pass rate and negative-path correctness
+
+## Later (Phase 5–7)
+
+- HTTP/IPC integration adapter and boundary tests (Phase 5)
+- Persistence and replay (Phase 6)
+- Minimal React operator UI (Phase 7)
 
 ## Sequencing Rules
 

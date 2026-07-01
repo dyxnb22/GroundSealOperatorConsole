@@ -60,9 +60,11 @@ A governed agent platform needs an interface that helps humans review, approve, 
 
 ## Current Stage
 
-Stage 0 is complete only when the project has clear contracts, explicit
-non-goals, phase boundaries, evaluation intent, and Cursor rules strong enough
-to keep parallel implementation work on track.
+**Phase 2 is complete.** Deterministic approval queue core (contracts, state machine, redaction, fixture adapter) with 26 passing tests.
+
+**Phase 3 is next:** expand negative-path regression coverage and error taxonomy.
+
+See [`TASKS.md`](TASKS.md) and [`docs/roadmap.md`](docs/roadmap.md) for sequencing.
 
 ## Relationship To The Parent Platform
 

@@ -1,0 +1,10 @@
+{
+  "tenantContext": {
+    "tenantId": "tenant-a",
+    "operatorId": "op-alex",
+    "role": "reviewer"
+  },
+  "approvalId": "apr-001",
+  "decision": "reject",
+  "reason": "Config patch lacks rollback plan"
+}

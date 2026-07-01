@@ -1,0 +1,20 @@
+{
+  "runId": "run-001",
+  "tenantId": "tenant-a",
+  "events": [
+    {
+      "eventId": "evt-001",
+      "timestamp": "2026-06-01T09:55:00.000Z",
+      "kind": "policy_check",
+      "summary": "Policy check passed",
+      "payloadRef": "payload-ref-001"
+    },
+    {
+      "eventId": "evt-002",
+      "timestamp": "2026-06-01T09:58:00.000Z",
+      "kind": "tool_call",
+      "summary": "Config diff generated",
+      "payloadRef": "payload-ref-002"
+    }
+  ]
+}

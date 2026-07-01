@@ -1,0 +1,9 @@
+{
+  "tenantContext": {
+    "tenantId": "tenant-a",
+    "operatorId": "op-alex",
+    "role": "reviewer"
+  },
+  "approvalId": "apr-001",
+  "decision": "approve"
+}
